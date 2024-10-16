@@ -13,7 +13,7 @@ const NavBar = (props: Props) => {
             <Link href="/">
                 <Image src={logo} width={40} height={40} priority alt='Verit-Icon'/>
             </Link>
-            <UserButton signInUrl='/'/>
+            <UserButton signInUrl='/sign-in'/>
         </div>
     </div>
   )
