@@ -1,0 +1,25 @@
+{
+  "name": "veritserver",
+  "version": "1.0.0",
+  "description": "Deals with GraphQL for data fetching",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: No tests specified\" && exit 1",
+    "compile": "tsc",
+    "start": "npm compile && node ./dist/index.js"
+  },
+  "keywords": [
+    "["
+  ],
+  "author": "odejs\",",
+  "license": "ISC",
+  "dependencies": {
+    "@apollo/server": "^4.11.0",
+    "@tsconfig/node18": "^18.2.4",
+    "graphql": "^16.9.0"
+  },
+  "engines": {
+    "node": "18.17.0",
+    "npm": "9.6.7"
+  }
+}
