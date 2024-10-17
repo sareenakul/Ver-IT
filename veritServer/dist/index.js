@@ -5,21 +5,14 @@ const standalone_1 = require("@apollo/server/standalone");
 const fs_1 = require("fs");
 const uuid_1 = require("uuid");
 //Execute Command: npm run compile && node ./dist/index.js
-// const typeDefs = `#graphql
-//   # Comments in GraphQL strings (such as this one) start with the hash (#) symbol.
-//   # This "Book" type defines the queryable fields for every book in our data source.
-//   type Book {
-//     title: String
-//     author: String
-//   }
-//   # The "Query" type is special: it lists all of the available queries that
-//   # clients can execute, along with the return type for each. In this
-//   # case, the "books" query returns an array of zero or more Books (defined above).
-//   type Query {
-//     books: [Book]
-//   }
-// `;
-const typeDefs = (0, fs_1.readFileSync)('./src/schema.graphql', 'utf-8');
+let typeDefs;
+try {
+    typeDefs = (0, fs_1.readFileSync)('./src/schema.graphql', 'utf-8');
+}
+catch (error) {
+    console.error("Error Found in Schema.graphql: ", error);
+    process.exit(1);
+}
 let users = [];
 let posts = [];
 let comments = [];

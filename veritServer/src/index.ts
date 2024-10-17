@@ -4,27 +4,15 @@ import { readFileSync } from 'fs';
 import {v4 as uuidv4} from 'uuid';
 //Execute Command: npm run compile && node ./dist/index.js
 
+let typeDefs: string;
 
-// const typeDefs = `#graphql
-//   # Comments in GraphQL strings (such as this one) start with the hash (#) symbol.
+try{
+    typeDefs = readFileSync('./src/schema.graphql', 'utf-8');
+} catch(error){
+    console.error("Error Found in Schema.graphql: ", error);
+    process.exit(1);
+}
 
-//   # This "Book" type defines the queryable fields for every book in our data source.
-
-//   type Book {
-//     title: String
-//     author: String
-//   }
-
-//   # The "Query" type is special: it lists all of the available queries that
-//   # clients can execute, along with the return type for each. In this
-//   # case, the "books" query returns an array of zero or more Books (defined above).
-
-//   type Query {
-//     books: [Book]
-//   }
-// `;
-
-const typeDefs = readFileSync('./src/schema.graphql', 'utf-8');
 
 interface User {
     id: string;
@@ -77,6 +65,8 @@ interface Tag {
 
 let tags: Tag[] = [];
 
+
+
 const resolvers = {
     Query: {
         users: () => users,
@@ -114,22 +104,6 @@ const resolvers = {
     },
 }
 
-// const books = [
-//     {
-//       title: 'The Awakening',
-//       author: 'Kate Chopin',
-//     },
-//     {
-//       title: 'City of Glass',
-//       author: 'Paul Auster',
-//     },
-// ];
-
-//   const resolvers = {
-//     Query: {
-//       books: () => books,
-//     },
-//   };
 
 const server = new ApolloServer({
     typeDefs,
