@@ -1,6 +1,7 @@
-import { ApolloServer } from '@apollo/server'; // preserve-line
-import { startStandaloneServer } from '@apollo/server/standalone';
-
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const server_1 = require("@apollo/server"); // preserve-line
+const standalone_1 = require("@apollo/server/standalone");
 const typeDefs = `#graphql
   # Comments in GraphQL strings (such as this one) start with the hash (#) symbol.
 
@@ -19,33 +20,27 @@ const typeDefs = `#graphql
     books: [Book]
   }
 `;
-
 const books = [
     {
-      title: 'The Awakening',
-      author: 'Kate Chopin',
+        title: 'The Awakening',
+        author: 'Kate Chopin',
     },
     {
-      title: 'City of Glass',
-      author: 'Paul Auster',
+        title: 'City of Glass',
+        author: 'Paul Auster',
     },
 ];
-
-  const resolvers = {
+const resolvers = {
     Query: {
-      books: () => books,
+        books: () => books,
     },
-  };
-
-const server = new ApolloServer({
+};
+const server = new server_1.ApolloServer({
     typeDefs,
     resolvers,
 });
-  
-startStandaloneServer(server, {
-    listen: {port: 4000},
-}).then(({url})=>{
-    console.log("Server ready at " + url)
-})
-
-
+(0, standalone_1.startStandaloneServer)(server, {
+    listen: { port: 4000 },
+}).then(({ url }) => {
+    console.log("Server ready at " + url);
+});
