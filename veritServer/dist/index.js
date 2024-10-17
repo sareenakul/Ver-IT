@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const server_1 = require("@apollo/server"); // preserve-line
 const standalone_1 = require("@apollo/server/standalone");
+//Execute Command: npm run compile && node ./dist/index.js
 const typeDefs = `#graphql
   # Comments in GraphQL strings (such as this one) start with the hash (#) symbol.
 

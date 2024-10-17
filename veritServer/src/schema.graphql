@@ -1,0 +1,60 @@
+type User {
+    id: ID
+    username: String!
+    email: String!
+    bio: String
+    profilePicture: String
+    createdAt: String!
+    posts: [Post]
+}
+
+type Post {
+    id: ID!
+    title: String!
+    content: String!
+    author: User!
+    createdAt: String!
+    updatedAt: String!
+    comments: [Comment]
+    likes: [Like]
+    tags: [Tag]
+}
+
+type Comment {
+    id: ID!
+    post: Post!
+    author: User!
+    content: String!
+    createdAt: String!
+}
+
+type Like {
+    id: ID!
+    post: Post!
+    user: User!
+    createdAt: String!
+}
+
+type Tag{
+    id: ID!
+    name: String!
+    posts: [Post]
+}
+
+
+  
+type Query {
+    users: [User]
+    posts: [Post]
+    post(id: ID!): Post
+    comments(postId: ID!): [Comment]
+    tags: [Tag]
+}
+
+type Mutation {
+    createUser(username: String!, email: String!, password: String!): User
+    createPost(title: String!, content: String!, authorId: ID!): Post
+    createComment(postId: ID!, authorId: ID!, content: String!): Comment
+    likePost(postId: ID!, userId: ID!): Like
+    createTag(name: String!): Tag
+}
