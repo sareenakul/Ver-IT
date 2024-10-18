@@ -70,11 +70,13 @@ const likes = [
         id: uuidv4(),
         postId: posts[0].id,
         createdAt: new Date().toISOString(),
+        likedByUserId: users[0].id,
     },
     {
         id: uuidv4(),
         postId: posts[1].id,
         createdAt: new Date().toISOString(),
+        likedByUserId: users[1].id,
     }
 ];
 

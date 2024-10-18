@@ -1,7 +1,7 @@
-const {users, posts, likes} = require('../sampleData');
+const {users, posts, likes, comments} = require('../sampleData');
 
-const {GraphQLObjectType, GraphQLID, GraphQLString, GraphQLList, GraphQLSchema} = require('graphql');
-
+const {GraphQLObjectType, GraphQLID, GraphQLString, GraphQLList, GraphQLSchema, GraphQLNonNull} = require('graphql');
+const { v4: uuidv4 } = require('uuid');
 
 // USER TYPE
 const UserType = new GraphQLObjectType({
@@ -43,7 +43,8 @@ const LikeType = new GraphQLObjectType({
     fields: () => ({
         id: { type: GraphQLID },
         postId: { type: GraphQLID },
-        createdAt: { type: GraphQLString }
+        createdAt: { type: GraphQLString },
+        likedByUserId: {type: GraphQLID}
     })
 });
 
@@ -106,8 +107,110 @@ const RootQuery = new GraphQLObjectType({
     }
 });
 
+const Mutation = new GraphQLObjectType({
+    name: 'Mutation',
+    fields: {
+        addUser: {
+            type: UserType,
+            args: {
+                username: {type: new GraphQLNonNull(GraphQLString)},
+                email: {type: new GraphQLNonNull(GraphQLString)},
+                password: {type: new GraphQLNonNull(GraphQLString)}
+            },
+            resolve(parent, args){
+                const user = {
+                    id: uuidv4(),
+                    username: args. username,
+                    email: args.email,
+                    password: args.password,
+                    createdAt: new Date().toISOString(),
+                    posts: []
+                };
+                users.push(user);
+                return user;
+            }
+        },
+        addPost: {
+            type: PostType,
+            args: {
+                title: {type: new GraphQLNonNull(GraphQLString)},
+                content: {type: new GraphQLNonNull(GraphQLString)},
+                authorId: {type: new GraphQLNonNull(GraphQLString)}
+            },
+            resolve(parent, args){
+                const post = {
+                    id: uuidv4(),
+                    title: args.title,
+                    content: args.content,
+                    authorId: args.authorId,
+                    createdAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString(),
+                    comments: [],
+                    likes: [],
+                    tags: []
+                };
+                posts.push(post);
+                return post;
+            }
+        },
+        addComment: {
+            type: CommentType,
+            args: {
+                postId: {type: new GraphQLNonNull(GraphQLString)},
+                authorId: {type: new GraphQLNonNull(GraphQLString)},
+                content: {type: new GraphQLNonNull(GraphQLString)}
+            },
+            resolve(parent, args){
+                const comment = {
+                    id: uuidv4(),
+                    postId: args.postId,
+                    authorId: args.authorId,
+                    content: args.content,
+                    createdAt: new Date().toISOString()
+                };
+                comments.push(comment);
+                return comment;
+            }
+        },
+        addLike: {
+            type: LikeType,
+            args: {
+                postId: {type: new GraphQLNonNull(GraphQLString)},
+                likedByUserId: {type: new GraphQLNonNull(GraphQLString)}
+            },
+            resolve(parent, args){
+                const like = {
+                    likeId: uuidv4(),
+                    postId: args.postId,
+                    likedByUserId: args.likedByUserId,
+                    createdAt: new Date().toISOString()
+                };
+                likes.push(like);
+                return like;
+            }
+        },
+        addTag: {
+            type: TagType,
+            args: {
+                name: {type: new GraphQLNonNull(GraphQLString)},
+                postIds: {type: new GraphQLList(GraphQLString)}
+            },
+            resolve(parent, args){
+                const tag = {
+                    id: uuidv4(),
+                    name: args.name,
+                    posts: args.postIds ? args.postIds.map(postId => posts.find(post => post.id === postId)).filter(post => post): []
+                };
+                tags.push(tag);
+                return tag;
+            }
+        }
+    }
+});
+
 
 // CREATE SCHEMA
 module.exports = new GraphQLSchema({
-    query: RootQuery
+    query: RootQuery,
+    mutation: Mutation
 });
