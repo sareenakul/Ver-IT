@@ -3,6 +3,12 @@ const {users, posts, likes, comments} = require('../sampleData');
 const {GraphQLObjectType, GraphQLID, GraphQLString, GraphQLList, GraphQLSchema, GraphQLNonNull} = require('graphql');
 const { v4: uuidv4 } = require('uuid');
 
+const User = require('../models/user');
+const Post = require('../models/Post');
+const Comment = require('../models/Comment');
+const Like = require('../models/Like');
+const Tag = require('../models/Tag');
+
 // USER TYPE
 const UserType = new GraphQLObjectType({
     name: 'User',
