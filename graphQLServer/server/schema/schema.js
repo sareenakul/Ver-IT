@@ -82,14 +82,16 @@ const RootQuery = new GraphQLObjectType({
             type: UserType,
             args: {id: {type: GraphQLString}},
             resolve(parent, args){
-                return users.find(user => user.id === args.id);
+                // return users.find(user => user.id === args.id);
+                return User.findById(args.id);
             }
         },
         post: {
             type: PostType,
             args: { id: { type: GraphQLString } },
             resolve(parent, args) {
-                return posts.find(post => post.id === args.id); // Return post by ID
+                return Post.findById(args.id);
+                // return posts.find(post => post.id === args.id); // Return post by ID
             }
         },
         comments: {
