@@ -6,6 +6,7 @@ const Post = require('../models/Post');
 const Comment = require('../models/Comment');
 const Like = require('../models/Like');
 const Tag = require('../models/Tag');
+const { posts } = require('../sampleData');
 
 // USER TYPE
 const UserType = new GraphQLObjectType({
@@ -81,14 +82,15 @@ const RootQuery = new GraphQLObjectType({
             type: new GraphQLList(PostType),
             args: {authorId: {type: GraphQLID}},
             resolve(parent, args){
-                return Post.findById(args.authorId).then(user => {
-                    if(!user){
-                        throw new Error("User not found!");
+                return Post.find({authorId: args.authorId}).then(posts => {
+                    if(!posts.length){
+                        throw new Error("User posts found for this author!");
                     }
-                    return Post.find({authorId: user.id});
+                    return posts;
                 });
             }
         },
+        // user by id Works perfect
         user: {
             type: UserType,
             args: {id: {type: GraphQLID}},
@@ -97,6 +99,7 @@ const RootQuery = new GraphQLObjectType({
                 return User.findById(args.id);
             }
         },
+        // post Works perfect for a postId
         post: {
             type: PostType,
             args: { id: { type: GraphQLID } },
@@ -105,11 +108,12 @@ const RootQuery = new GraphQLObjectType({
                 // return posts.find(post => post.id === args.id); // Return post by ID
             }
         },
+        // comments returns all comments on a post
         comments: {
             type: new GraphQLList(CommentType),
             args: { postId: { type: GraphQLID}},
             resolve(parent, args) {
-                return Comment.find({postId: args.postId}); // Return all comments
+                return Comment.find(); // Return all comments
             }
         },
         likes: {
