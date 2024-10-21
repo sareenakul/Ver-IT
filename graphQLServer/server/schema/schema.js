@@ -79,9 +79,9 @@ const RootQuery = new GraphQLObjectType({
         },
         postsByID: {
             type: new GraphQLList(PostType),
-            args: {userId: {type: GraphQLString}},
+            args: {authorId: {type: GraphQLID}},
             resolve(parent, args){
-                return Post.findById(args.userId).then(user => {
+                return Post.findById(args.authorId).then(user => {
                     if(!user){
                         throw new Error("User not found!");
                     }
@@ -91,7 +91,7 @@ const RootQuery = new GraphQLObjectType({
         },
         user: {
             type: UserType,
-            args: {id: {type: GraphQLString}},
+            args: {id: {type: GraphQLID}},
             resolve(parent, args){
                 // return users.find(user => user.id === args.id);
                 return User.findById(args.id);
@@ -99,7 +99,7 @@ const RootQuery = new GraphQLObjectType({
         },
         post: {
             type: PostType,
-            args: { id: { type: GraphQLString } },
+            args: { id: { type: GraphQLID } },
             resolve(parent, args) {
                 return Post.findById(args.id);
                 // return posts.find(post => post.id === args.id); // Return post by ID
@@ -107,20 +107,23 @@ const RootQuery = new GraphQLObjectType({
         },
         comments: {
             type: new GraphQLList(CommentType),
+            args: { postId: { type: GraphQLID}},
             resolve(parent, args) {
-                return comments; // Return all comments
+                return Comment.find({postId: args.postId}); // Return all comments
             }
         },
         likes: {
             type: new GraphQLList(LikeType),
+            args: { postId: { type: GraphQLID}},
             resolve(parent, args) {
-                return likes; // Return all likes
+                return Like.find({postId: args.postId}); // Return all likes
             }
         },
         tags: {
             type: new GraphQLList(TagType),
+            args: { postId: { type: GraphQLString}},
             resolve(parent, args) {
-                return tags; // Return all tags
+                return Tag.find({postId: args.postId}); // Return all tags
             }
         }
     }
@@ -202,8 +205,7 @@ const Mutation = new GraphQLObjectType({
                     likedByUserId: args.likedByUserId,
                     createdAt: new Date().toISOString()
                 });
-                likes.push(like);
-                return like;
+                return like.save();
             }
         },
         addTag: {
@@ -218,8 +220,7 @@ const Mutation = new GraphQLObjectType({
                     name: args.name,
                     posts: args.postIds ? args.postIds.map(postId => posts.find(post => post.id === postId)).filter(post => post): []
                 });
-                tags.push(tag);
-                return tag;
+                return tag.save();
             }
         }
     }
