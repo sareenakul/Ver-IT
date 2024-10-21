@@ -1,5 +1,3 @@
-const {users, posts, likes, comments} = require('../sampleData');
-
 const {GraphQLObjectType, GraphQLID, GraphQLString, GraphQLList, GraphQLSchema, GraphQLNonNull} = require('graphql');
 const { v4: uuidv4 } = require('uuid');
 
