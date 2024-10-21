@@ -67,13 +67,26 @@ const RootQuery = new GraphQLObjectType({
         users: {
             type: new GraphQLList(UserType),
             resolve(parent, args){
-                return users;
+                //Finds all users
+                return User.find()
             }
         },
         posts: {
             type: new GraphQLList(PostType),
             resolve(parent, args){
-                return posts;
+                return Post.find();
+            }
+        },
+        postsByID: {
+            type: new GraphQLList(PostType),
+            args: {userId: {type: GraphQLString}},
+            resolve(parent, args){
+                return Post.findById(args.userId).then(user => {
+                    if(!user){
+                        throw new Error("User not found!");
+                    }
+                    return Post.find({authorId: user.id});
+                });
             }
         },
         user: {
@@ -124,16 +137,15 @@ const Mutation = new GraphQLObjectType({
                 password: {type: new GraphQLNonNull(GraphQLString)}
             },
             resolve(parent, args){
-                const user = {
+                const user = new User({
                     id: uuidv4(),
                     username: args. username,
                     email: args.email,
                     password: args.password,
                     createdAt: new Date().toISOString(),
                     posts: []
-                };
-                users.push(user);
-                return user;
+                });
+                return user.save();
             }
         },
         addPost: {
@@ -144,7 +156,7 @@ const Mutation = new GraphQLObjectType({
                 authorId: {type: new GraphQLNonNull(GraphQLString)}
             },
             resolve(parent, args){
-                const post = {
+                const post = new Post({
                     id: uuidv4(),
                     title: args.title,
                     content: args.content,
@@ -154,9 +166,8 @@ const Mutation = new GraphQLObjectType({
                     comments: [],
                     likes: [],
                     tags: []
-                };
-                posts.push(post);
-                return post;
+                });
+                return post.save();
             }
         },
         addComment: {
@@ -167,15 +178,15 @@ const Mutation = new GraphQLObjectType({
                 content: {type: new GraphQLNonNull(GraphQLString)}
             },
             resolve(parent, args){
-                const comment = {
+                const comment = new Comment({
                     id: uuidv4(),
                     postId: args.postId,
                     authorId: args.authorId,
                     content: args.content,
                     createdAt: new Date().toISOString()
-                };
-                comments.push(comment);
-                return comment;
+                });
+                
+                return comment.save();
             }
         },
         addLike: {
@@ -185,12 +196,12 @@ const Mutation = new GraphQLObjectType({
                 likedByUserId: {type: new GraphQLNonNull(GraphQLString)}
             },
             resolve(parent, args){
-                const like = {
+                const like = new Like({
                     likeId: uuidv4(),
                     postId: args.postId,
                     likedByUserId: args.likedByUserId,
                     createdAt: new Date().toISOString()
-                };
+                });
                 likes.push(like);
                 return like;
             }
@@ -202,11 +213,11 @@ const Mutation = new GraphQLObjectType({
                 postIds: {type: new GraphQLList(GraphQLString)}
             },
             resolve(parent, args){
-                const tag = {
+                const tag = new Tag({
                     id: uuidv4(),
                     name: args.name,
                     posts: args.postIds ? args.postIds.map(postId => posts.find(post => post.id === postId)).filter(post => post): []
-                };
+                });
                 tags.push(tag);
                 return tag;
             }
