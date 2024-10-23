@@ -136,6 +136,7 @@ const RootQuery = new GraphQLObjectType({
 const Mutation = new GraphQLObjectType({
     name: 'Mutation',
     fields: {
+        // Works absolutely fine
         addUser: {
             type: UserType,
             args: {
@@ -155,6 +156,7 @@ const Mutation = new GraphQLObjectType({
                 return user.save();
             }
         },
+        // Works absolutely fine
         addPost: {
             type: PostType,
             args: {
