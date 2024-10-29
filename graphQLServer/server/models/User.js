@@ -9,4 +9,5 @@ const userSchema = new mongoose.Schema({
     posts: [{type: mongoose.Schema.Types.ObjectId, ref: 'Post'}]
 });
 
-module.exports = mongoose.model('User', userSchema);
+const User = mongoose.model('User', userSchema);
+module.exports = User;

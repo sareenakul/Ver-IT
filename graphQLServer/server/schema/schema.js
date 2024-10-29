@@ -1,6 +1,7 @@
 const {GraphQLObjectType, GraphQLID, GraphQLString, GraphQLList, GraphQLSchema, GraphQLNonNull} = require('graphql');
 const { v4: uuidv4 } = require('uuid');
 
+
 const User = require('../models/user');
 const Post = require('../models/Post');
 const Comment = require('../models/Comment');
@@ -30,9 +31,21 @@ const PostType = new GraphQLObjectType({
         title: {type: GraphQLString},
         content: {type: GraphQLString},
         authorId: {type: GraphQLID},
-        comments: {type: GraphQLList(CommentType)},
-        likes: {type: GraphQLList(LikeType)},
-        tags: {type: GraphQLList(TagType)}
+        comments: {type: new GraphQLList(CommentType),
+            resolve(parent, args){
+                return Comment.find({postId: parent.id});
+            }
+        },
+        likes: {type: new GraphQLList(LikeType),
+            resolve(parent, args){
+                return Like.find({postId: parent.id});
+            }
+        },
+        tags: {type: new GraphQLList(TagType),
+            resolve(parent, args){
+                return Tag.find({postId: parent.id});
+            }
+        }
     })
 });
 
@@ -189,7 +202,7 @@ const Mutation = new GraphQLObjectType({
                 id: {type: new GraphQLNonNull(GraphQLID)}
             },
             resolve(parent, args){
-                return User.findByIdAndRemove(args.id).then(user =>{
+                return User.findByIdAndDelete(args.id).then(user =>{
                     if(!user){
                         throw new Error("User not found");
                     }
@@ -203,7 +216,7 @@ const Mutation = new GraphQLObjectType({
                 id: {type: new GraphQLNonNull(GraphQLID)}
             },
             resolve(parent, args){
-                return Post.findByIdAndRemove(args.id).then(post => {
+                return Post.findByIdAndDelete(args.id).then(post => {
                     if(!post){
                         throw new Error("Post not found!");
                     }
@@ -217,7 +230,7 @@ const Mutation = new GraphQLObjectType({
                 id: {type: new GraphQLNonNull(GraphQLID)}
             },
             resolve(parent, args){
-                return Comment.findByIdAndRemove(args.id).then(comment => {
+                return Comment.findByIdAndDelete(args.id).then(comment => {
                     if(!comment){
                         throw new Error("Comment not found!");
                     }
@@ -231,7 +244,7 @@ const Mutation = new GraphQLObjectType({
                 id: {type: new GraphQLNonNull(GraphQLID)}
             },
             resolve(parent, args){
-                return Like.findByIdAndRemove(args.id).then(like => {
+                return Like.findByIdAndDelete(args.id).then(like => {
                     if(!like){
                         throw new Error("Like not found!");
                     }
