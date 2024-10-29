@@ -192,6 +192,48 @@ const Mutation = new GraphQLObjectType({
                     return user;
                 })
             }
+        },
+        removePost: {
+            type: PostType,
+            args: {
+                id: {type: new GraphQLNonNull(GraphQLID)}
+            },
+            resolve(parent, args){
+                return Post.findByIdAndRemove(args.id).then(post => {
+                    if(!post){
+                        throw new Error("Post not found!");
+                    }
+                    return post;
+                })
+            }
+        },
+        removeComment: {
+            type: CommentType,
+            args: {
+                id: {type: new GraphQLNonNull(GraphQLID)}
+            },
+            resolve(parent, args){
+                return Comment.findByIdAndRemove(args.id).then(comment => {
+                    if(!comment){
+                        throw new Error("Comment not found!");
+                    }
+                    return comment;
+                })
+            }
+        },
+        removeLike: {
+            type: LikeType,
+            args: {
+                id: {type: new GraphQLNonNull(GraphQLID)}
+            },
+            resolve(parent, args){
+                return Like.findByIdAndRemove(args.id).then(like => {
+                    if(!like){
+                        throw new Error("Like not found!");
+                    }
+                    return like;
+                })
+            }
         }
         ,
         addComment: {
