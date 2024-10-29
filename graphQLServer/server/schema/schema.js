@@ -7,7 +7,7 @@ const Post = require('../models/Post');
 const Comment = require('../models/Comment');
 const Like = require('../models/Like');
 const Tag = require('../models/Tag');
-const { posts } = require('../sampleData');
+
 
 // USER TYPE
 const UserType = new GraphQLObjectType({
@@ -75,7 +75,11 @@ const TagType = new GraphQLObjectType({
     fields: () => ({
         id: { type: GraphQLID },
         name: { type: GraphQLString },
-        posts: { type: new GraphQLList(PostType) } // Reference to PostType
+        posts: { type: new GraphQLList(PostType),
+            resolve(parent, args){
+                return Post.find({tags: parent.id});
+            }
+         } // Reference to PostType
     })
 });
 
@@ -87,6 +91,13 @@ const RootQuery = new GraphQLObjectType({
             resolve(parent, args){
                 //Finds all users
                 return User.find()
+            }
+        },
+        postsWithTagID: {
+            type: new GraphQLList(PostType),
+            args: {tagId: {type: GraphQLNonNull(GraphQLID)}},
+            resolve(parent, args){
+                return Post.find({tagId: args.tagId});
             }
         },
         posts: {
@@ -101,7 +112,7 @@ const RootQuery = new GraphQLObjectType({
             resolve(parent, args){
                 return Post.find({authorId: args.authorId}).then(posts => {
                     if(!posts.length){
-                        throw new Error("User posts found for this author!");
+                        throw new Error("User posts not found for this author!");
                     }
                     return posts;
                 });
@@ -140,11 +151,20 @@ const RootQuery = new GraphQLObjectType({
                 return Like.find({postId: args.postId}); // Return all likes
             }
         },
+        // Working Fine
+        tag: {
+            type: TagType,
+            args: {tagId: {type: GraphQLID}},
+            resolve(parent, args){
+                return Tag.findById(args.tagId);
+            }
+        }
+        ,
         tags: {
             type: new GraphQLList(TagType),
-            args: { postId: { type: GraphQLString}},
+            args: { postId: { type: GraphQLID}},
             resolve(parent, args) {
-                return Tag.find({postId: args.postId}); // Return all tags
+                return Tag.find(); // Return all tags
             }
         }
     }
@@ -179,7 +199,8 @@ const Mutation = new GraphQLObjectType({
             args: {
                 title: {type: new GraphQLNonNull(GraphQLString)},
                 content: {type: new GraphQLNonNull(GraphQLString)},
-                authorId: {type: new GraphQLNonNull(GraphQLString)}
+                authorId: {type: new GraphQLNonNull(GraphQLString)},
+                // tags: {type: new GraphQLList(Str)}
             },
             resolve(parent, args){
                 const post = new Post({
@@ -202,12 +223,14 @@ const Mutation = new GraphQLObjectType({
                 id: {type: new GraphQLNonNull(GraphQLID)}
             },
             resolve(parent, args){
-                return User.findByIdAndDelete(args.id).then(user =>{
-                    if(!user){
-                        throw new Error("User not found");
-                    }
-                    return user;
-                })
+                return Post.deleteMany({ authorId: args.id}).then(() =>{
+                    return User.findByIdAndDelete(args.id).then(user =>{
+                        if(!user){
+                            throw new Error("User not found");
+                        }
+                        return user;
+                    });
+                });
             }
         },
         removePost: {
@@ -280,7 +303,7 @@ const Mutation = new GraphQLObjectType({
             },
             resolve(parent, args){
                 const like = new Like({
-                    likeId: uuidv4(),
+                    id: uuidv4(),
                     postId: args.postId,
                     likedByUserId: args.likedByUserId,
                     createdAt: new Date().toISOString()

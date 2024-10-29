@@ -7,4 +7,5 @@ const tagSchema = new mongoose.Schema({
     posts: [{type: mongoose.Schema.Types.ObjectId, ref: 'Post'}]
 });
 
-module.exports = mongoose.model('Tag', tagSchema);
+const Tag = mongoose.model('Tag', tagSchema);
+module.exports = Tag;
