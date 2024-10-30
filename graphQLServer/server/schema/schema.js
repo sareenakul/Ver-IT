@@ -383,6 +383,25 @@ const Mutation = new GraphQLObjectType({
                 });
                 
             }
+        },
+        updateUserStatus: {
+            type: UserType,
+            args: {
+                id: { type: new GraphQLNonNull(GraphQLID)},
+                status: {type: new GraphQLNonNull(UserStatusEnum)}
+            },
+            resolve(parent, args){
+                return User.findByIdAndUpdate(
+                    args.id,
+                    { status: args.status},
+                    {new: true}
+                ).then(user => {
+                    if(!user){
+                        throw new Error("User not found");
+                    }
+                    return user;
+                });
+            }
         }
     }
 });
