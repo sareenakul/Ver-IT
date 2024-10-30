@@ -438,7 +438,38 @@ const Mutation = new GraphQLObjectType({
                     return user;
                 });
             }
-        }
+        },
+        updatePost: {
+            type: PostType,
+            args: {
+                id: {type: GraphQLNonNull(GraphQLID)},
+                title: {type: GraphQLString},
+                content: {type: GraphQLString},
+                tags: {type: new GraphQLList(GraphQLString)}
+            },
+            resolve(parent, args){
+                const updates = {};
+                if (args.title){ 
+                    updates.title = args.title;
+                }
+                if (args.content){ 
+                    updates.content = args.content;
+                }
+                if (args.tags){ 
+                    updates.tags = args.tags;
+                }
+                return Post.findByIdAndUpdate(
+                    args.id,
+                    updates,
+                    {new: true}
+                ).then(post => {
+                    if(!post){
+                        throw new Error("Post not found")
+                    }
+                    return post;
+                });
+            }
+        },
     }
 });
 
