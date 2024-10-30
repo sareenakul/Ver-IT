@@ -1,4 +1,4 @@
-const {GraphQLObjectType, GraphQLID, GraphQLString, GraphQLList, GraphQLSchema, GraphQLNonNull} = require('graphql');
+const {GraphQLObjectType, GraphQLID, GraphQLString, GraphQLList, GraphQLSchema, GraphQLNonNull, GraphQLEnumType} = require('graphql');
 const { v4: uuidv4 } = require('uuid');
 
 
@@ -8,6 +8,14 @@ const Comment = require('../models/Comment');
 const Like = require('../models/Like');
 const Tag = require('../models/Tag');
 
+const UserStatusEnum = new GraphQLEnumType({
+    name: 'UserStatus',
+    values: {
+        ONLINE: { value: 'Online' },
+        OFFLINE: { value: 'Offline' },
+        DND: { value: 'DND' }
+    }
+});
 
 // USER TYPE
 const UserType = new GraphQLObjectType({
@@ -16,7 +24,7 @@ const UserType = new GraphQLObjectType({
         id: { type: GraphQLID},
         username: {type: GraphQLString},
         email: {type: GraphQLString},
-        status: {type: GraphQLString},
+        status: {type: GraphQLEnumType},
         posts: {type: new GraphQLList(PostType),
             resolve(parent, args){
                 return Post.find({authorId: parent.id});
@@ -24,6 +32,7 @@ const UserType = new GraphQLObjectType({
         }
     })
 })
+
 
 const PostType = new GraphQLObjectType({
     name: 'Post',
@@ -180,7 +189,8 @@ const Mutation = new GraphQLObjectType({
             args: {
                 username: {type: new GraphQLNonNull(GraphQLString)},
                 email: {type: new GraphQLNonNull(GraphQLString)},
-                password: {type: new GraphQLNonNull(GraphQLString)}
+                password: {type: new GraphQLNonNull(GraphQLString)},
+                status: {type: UserStatusEnum}
             },
             resolve(parent, args){
                 const user = new User({
@@ -189,7 +199,8 @@ const Mutation = new GraphQLObjectType({
                     email: args.email,
                     password: args.password,
                     createdAt: new Date().toISOString(),
-                    posts: []
+                    posts: [],
+                    status: args.status || 'Offline'
                 });
                 return user.save();
             }
