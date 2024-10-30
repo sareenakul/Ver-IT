@@ -402,6 +402,42 @@ const Mutation = new GraphQLObjectType({
                     return user;
                 });
             }
+        },
+        updateUser: {
+            type: UserType,
+            args: {
+                id: {type: GraphQLNonNull(GraphQLID)},
+                username: {type: GraphQLString},
+                email: {type: GraphQLString},
+                password: {type: GraphQLString},
+                status: {type: UserStatusEnum}
+            },
+            resolve(parent, args){
+                const updates = {};
+                if(args.username){
+                    updates.username = args.username;
+                }
+                if(args.email){
+                    updates.email = args.email;
+                }
+                if(args.password){
+                    updates.password = args.password;
+                }
+                if(args.status){
+                    updates.status = args.status;
+                }
+
+                return User.findByIdAndUpdate(
+                    args.id,
+                    updates,
+                    {new: true}
+                ).then(user => {
+                    if(!user){
+                        throw new Error("User not found");
+                    }
+                    return user;
+                });
+            }
         }
     }
 });
