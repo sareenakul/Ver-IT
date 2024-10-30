@@ -318,12 +318,15 @@ const Mutation = new GraphQLObjectType({
                 postIds: {type: new GraphQLList(GraphQLString)}
             },
             resolve(parent, args){
-                const tag = new Tag({
-                    id: uuidv4(),
-                    name: args.name,
-                    posts: args.postIds ? args.postIds.map(postId => posts.find(post => post.id === postId)).filter(post => post): []
+                return Post.find({_id: { $in: args.postIds}}).then(posts => {
+                    const tag = new Tag({
+                        id: uuidv4(),
+                        name: args.name,
+                        posts: posts
+                    });
+                    return tag.save();
                 });
-                return tag.save();
+                
             }
         }
     }
