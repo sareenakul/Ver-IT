@@ -43,7 +43,7 @@ const PostType = new GraphQLObjectType({
         },
         tags: {type: new GraphQLList(TagType),
             resolve(parent, args){
-                return Tag.find({postId: parent.id});
+                return Tag.find({posts: parent.id});
             }
         }
     })
