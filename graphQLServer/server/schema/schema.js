@@ -256,13 +256,18 @@ const Mutation = new GraphQLObjectType({
             args: {
                 id: {type: new GraphQLNonNull(GraphQLID)}
             },
-            resolve(parent, args){
-                return Post.findByIdAndDelete(args.id).then(post => {
-                    if(!post){
-                        throw new Error("Post not found!");
-                    }
-                    return post;
-                })
+            async resolve(parent, args){
+                const post = await Post.findById(args.id);
+                if(!post){
+                    throw new Error("Post not found!");
+                }
+                await Comment.deleteMany({ postId: args.id });
+
+        // Delete all likes on this post
+                await Like.deleteMany({ postId: args.id });
+
+        // Delete the post
+                return Post.findByIdAndDelete(args.id)
             }
         },
         removeComment: {
@@ -291,6 +296,26 @@ const Mutation = new GraphQLObjectType({
                     }
                     return like;
                 })
+            }
+        },
+        removeTagFromPost: {
+            type: TagType,
+            args: {
+                postId: {type: new GraphQLNonNull(GraphQLID)},
+                tagId: {type: new GraphQLNonNull(GraphQLID)}
+            },
+            async resolve(parent, args){
+                const tag = await Tag.findById(args.tagId);
+                if(!tag){
+                    throw new Error("Tag not found");
+                }
+
+                if(!tag.posts.includes(args.postId)){
+                    throw new Error("Post ID not found in the tag's posts");
+                }
+                tag.posts = tag.posts.filter(postId => postId.toString() !== args.postId);
+
+                return tag.save();
             }
         }
         ,
