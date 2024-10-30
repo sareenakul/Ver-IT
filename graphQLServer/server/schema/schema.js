@@ -222,15 +222,33 @@ const Mutation = new GraphQLObjectType({
             args: {
                 id: {type: new GraphQLNonNull(GraphQLID)}
             },
-            resolve(parent, args){
-                return Post.deleteMany({ authorId: args.id}).then(() =>{
-                    return User.findByIdAndDelete(args.id).then(user =>{
-                        if(!user){
-                            throw new Error("User not found");
-                        }
-                        return user;
-                    });
-                });
+            async resolve(parent, args) {
+                const user = await User.findById(args.id);
+                if (!user) {
+                    throw new Error("User not found");
+                }
+        
+                // Delete all posts by the user
+                const posts = await Post.find({ authorId: args.id });
+        
+                // Delete all comments on the user's posts
+                const postIds = posts.map(post => post._id);
+                await Comment.deleteMany({ postId: { $in: postIds } });
+        
+                // Delete all likes on the user's posts
+                await Like.deleteMany({ postId: { $in: postIds } });
+        
+                // Delete user's own comments on any posts
+                await Comment.deleteMany({ authorId: args.id });
+        
+                // Delete user's likes on any posts
+                await Like.deleteMany({ likedByUserId: args.id });
+        
+                // Delete all posts by the user
+                await Post.deleteMany({ authorId: args.id });
+        
+                // Finally, delete the user
+                return User.findByIdAndDelete(args.id);
             }
         },
         removePost: {
