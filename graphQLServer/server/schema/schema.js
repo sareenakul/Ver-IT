@@ -384,6 +384,7 @@ const Mutation = new GraphQLObjectType({
                 
             }
         },
+        //works perfect
         updateUserStatus: {
             type: UserType,
             args: {
@@ -403,6 +404,7 @@ const Mutation = new GraphQLObjectType({
                 });
             }
         },
+        //works perfect
         updateUser: {
             type: UserType,
             args: {
@@ -439,6 +441,7 @@ const Mutation = new GraphQLObjectType({
                 });
             }
         },
+        //works perfect
         updatePost: {
             type: PostType,
             args: {
@@ -470,6 +473,7 @@ const Mutation = new GraphQLObjectType({
                 });
             }
         },
+        //works perfect
         toggleLike: {
             type: LikeType,
             args: {
@@ -494,6 +498,7 @@ const Mutation = new GraphQLObjectType({
                 });
             }
         },
+        //Works perfect
         updateComment: {
             type: CommentType,
             args: {
