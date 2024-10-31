@@ -43,7 +43,14 @@ const UserType = new GraphQLObjectType({
             resolve(parent, args){
                 return Comment.find({authorId: parent.id});
             }
+        },
+        countComments: {
+            type: GraphQLInt,
+            resolve(parent, args) {
+                return Comment.countDocuments({ authorId: parent.id });
+            }
         }
+
     })
 })
 
