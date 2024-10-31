@@ -129,16 +129,16 @@ const TagType = new GraphQLObjectType({
     fields: () => ({
         id: { type: GraphQLID },
         name: { type: GraphQLString },
-        posts: { type: new GraphQLList(PostType),
-            resolve(parent, args){
-                return Post.find({tags: parent.id});
+        posts: {
+            type: new GraphQLList(PostType),
+            resolve(parent, args) {
+                return Post.find({ tags: parent.id }); // Assuming tags is an array of tag IDs in the Post model
             }
-        }, // Reference to PostType
-        //Need to fix
-        postsCount: {
+        },
+        postsCount: { // Field to count the number of posts associated with this tag
             type: GraphQLInt,
             resolve(parent, args) {
-                return Post.countDocuments({ tags: parent.id });
+                return Post.countDocuments({ tags: parent.id }); // Count posts that include this tag ID
             }
         }
     })
