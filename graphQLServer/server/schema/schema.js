@@ -51,7 +51,7 @@ const UserType = new GraphQLObjectType({
                 return Comment.countDocuments({ authorId: parent.id });
             }
         },
-        //figure out
+        //Works Perfect
         likedPosts: {
             type: new GraphQLList(PostType),
             resolve(parent, args){
@@ -61,7 +61,6 @@ const UserType = new GraphQLObjectType({
                 });
             }
         }
-
     })
 })
 
@@ -86,6 +85,13 @@ const PostType = new GraphQLObjectType({
         tags: {type: new GraphQLList(TagType),
             resolve(parent, args){
                 return Tag.find({posts: parent.id});
+            }
+        },
+        //works perfect
+        likesCount:{
+            type: GraphQLInt,
+            resolve(parent, args) {
+                return Like.countDocuments({ postId: parent.id });
             }
         }
     })
