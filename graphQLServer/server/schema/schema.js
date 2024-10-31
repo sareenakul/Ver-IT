@@ -31,10 +31,17 @@ const UserType = new GraphQLObjectType({
             }
         },
         // Returns the count of posts for each user correctly
-        postsCount: {
+        postsByUserCount: {
             type: GraphQLInt,
             resolve(parent, args){
                 return Post.countDocuments({authorId: parent.id});
+            }
+        },
+        //Works Fine by showing all the comments the user ever made.
+        commentsByUser: {
+            type: new GraphQLList(CommentType),
+            resolve(parent, args){
+                return Comment.find({authorId: parent.id});
             }
         }
     })
