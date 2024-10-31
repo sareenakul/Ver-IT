@@ -133,7 +133,13 @@ const TagType = new GraphQLObjectType({
             resolve(parent, args){
                 return Post.find({tags: parent.id});
             }
-         } // Reference to PostType
+        }, // Reference to PostType
+        postsCount: {
+            type: GraphQLInt,
+            resolve(parent, args) {
+                return Post.countDocuments({ tags: parent.id });
+            }
+        }
     })
 });
 
