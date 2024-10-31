@@ -44,10 +44,21 @@ const UserType = new GraphQLObjectType({
                 return Comment.find({authorId: parent.id});
             }
         },
+        // Works fine!
         countComments: {
             type: GraphQLInt,
             resolve(parent, args) {
                 return Comment.countDocuments({ authorId: parent.id });
+            }
+        },
+        //figure out
+        likedPosts: {
+            type: new GraphQLList(PostType),
+            resolve(parent, args){
+                return Like.find({likedByUserId: parent.id}).then(likes => {
+                    const postIds = likes.map(like => like.postId);
+                    return Post.find({_id: {$in: postIds}});
+                });
             }
         }
 
@@ -179,7 +190,7 @@ const RootQuery = new GraphQLObjectType({
             type: new GraphQLList(LikeType),
             args: { postId: { type: GraphQLID}},
             resolve(parent, args) {
-                return Like.find({postId: args.postId}); // Return all likes
+                return Like.find({postId: args.postId}); // Return all likes on a post
             }
         },
         // Working Fine
