@@ -470,6 +470,49 @@ const Mutation = new GraphQLObjectType({
                 });
             }
         },
+        toggleLike: {
+            type: LikeType,
+            args: {
+                postId: {type: new GraphQLNonNull(GraphQLID)},
+                likedByUserId: {type: new GraphQLNonNull(GraphQLID)}
+            },
+            resolve(parent, args){
+                return Like.findOne({postId: args.postId, likedByUserId: args.likedByUserId}).then(existingLike => {
+                    if(existingLike){
+                        return Like.findByIdAndDelete(existingLike.id).then(() =>{
+                            return existingLike;
+                        });
+                    } else{
+                        const newLike = new Like({
+                            id: uuidv4(),
+                            postId: args.postId,
+                            likedByUserId: args.likedByUserId,
+                            createdAt: new Date().toISOString()
+                        });
+                        return newLike.save();
+                    }
+                });
+            }
+        },
+        updateComment: {
+            type: CommentType,
+            args: {
+                id: {type: new GraphQLNonNull(GraphQLID)},
+                content: {type: new GraphQLNonNull(GraphQLString)} //updated content
+            },
+            resolve(parent, args){
+                return Comment.findByIdAndUpdate(
+                    args.id,
+                    {content: args.content},
+                    {new: true}
+                ).then(comment => {
+                    if(!comment){
+                        throw new Error("Comment not found");
+                    }
+                    return comment;
+                });
+            }
+        }
     }
 });
 
