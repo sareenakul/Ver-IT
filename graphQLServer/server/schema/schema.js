@@ -1,4 +1,4 @@
-const {GraphQLObjectType, GraphQLID, GraphQLString, GraphQLList, GraphQLSchema, GraphQLNonNull, GraphQLEnumType} = require('graphql');
+const {GraphQLObjectType, GraphQLID, GraphQLString, GraphQLList, GraphQLSchema, GraphQLNonNull, GraphQLEnumType, GraphQLInt} = require('graphql');
 const { v4: uuidv4 } = require('uuid');
 
 
@@ -28,6 +28,13 @@ const UserType = new GraphQLObjectType({
         posts: {type: new GraphQLList(PostType),
             resolve(parent, args){
                 return Post.find({authorId: parent.id});
+            }
+        },
+        // Returns the count of posts for each user correctly
+        postsCount: {
+            type: GraphQLInt,
+            resolve(parent, args){
+                return Post.countDocuments({authorId: parent.id});
             }
         }
     })
