@@ -134,6 +134,7 @@ const TagType = new GraphQLObjectType({
                 return Post.find({tags: parent.id});
             }
         }, // Reference to PostType
+        //Need to fix
         postsCount: {
             type: GraphQLInt,
             resolve(parent, args) {
