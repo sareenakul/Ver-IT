@@ -93,6 +93,12 @@ const PostType = new GraphQLObjectType({
             resolve(parent, args) {
                 return Like.countDocuments({ postId: parent.id });
             }
+        },
+        commentsCount:{
+            type: GraphQLInt,
+            resolve(parent, args) {
+                return Comment.countDocuments({ postId: parent.id });
+            }
         }
     })
 });
