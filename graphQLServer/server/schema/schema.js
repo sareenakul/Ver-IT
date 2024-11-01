@@ -7,6 +7,7 @@ const Post = require('../models/Post');
 const Comment = require('../models/Comment');
 const Like = require('../models/Like');
 const Tag = require('../models/Tag');
+const { tags } = require('../sampleData');
 
 const UserStatusEnum = new GraphQLEnumType({
     name: 'UserStatus',
@@ -137,8 +138,10 @@ const TagType = new GraphQLObjectType({
         },
         postsCount: { // Field to count the number of posts associated with this tag
             type: GraphQLInt,
-            resolve(parent, args) {
-                return Post.countDocuments({ tags: parent.id }); // Count posts that include this tag ID
+            async resolve(parent, args) {
+                const count = await Post.countDocuments({tags: parent.id});
+                return count;
+                //return Post.countDocuments({ tags: parent.id }); // Count posts that include this tag ID
             }
         }
     })
@@ -263,9 +266,10 @@ const Mutation = new GraphQLObjectType({
                 title: {type: new GraphQLNonNull(GraphQLString)},
                 content: {type: new GraphQLNonNull(GraphQLString)},
                 authorId: {type: new GraphQLNonNull(GraphQLString)},
+                tagIds: { type: new GraphQLList(GraphQLID) }
                 // tags: {type: new GraphQLList(Str)}
             },
-            resolve(parent, args){
+            async resolve(parent, args){
                 const post = new Post({
                     id: uuidv4(),
                     title: args.title,
@@ -275,9 +279,9 @@ const Mutation = new GraphQLObjectType({
                     updatedAt: new Date().toISOString(),
                     comments: [],
                     likes: [],
-                    tags: []
+                    tags: args.tagIds
                 });
-                return post.save();
+                return await post.save();
             }
         },
         removeUser: {
