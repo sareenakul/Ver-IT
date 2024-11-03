@@ -65,6 +65,8 @@ const UserType = new GraphQLObjectType({
     })
 })
 
+//Need to set up elements for a profile/bio.
+
 
 const PostType = new GraphQLObjectType({
     name: 'Post',
